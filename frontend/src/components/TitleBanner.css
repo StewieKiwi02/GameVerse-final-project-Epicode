@@ -1,0 +1,50 @@
+.title-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 75px; 
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+body.light-theme .title-banner {
+  background-color: #f8f9fa;
+  color: #000;
+}
+
+body.dark-theme .title-banner {
+  background-color: #212529;
+  color: #fff;
+}
+
+.rainbow-text {
+  font-weight: bold;
+  font-size: 1.5rem;
+  animation: colorChange 6s linear infinite;
+  margin: 0;
+  max-width: 95vw;
+  text-align: center;
+  line-height: 1.1;
+}
+
+@media (max-width: 576px) {
+  .rainbow-text {
+    font-size: 1rem;
+  }
+}
+
+@keyframes colorChange {
+  0%   { color: #ff6ec4; }
+  16%  { color: #7873f5; }
+  33%  { color: #4fd1c5; }
+  50%  { color: #f9cb28; }
+  66%  { color: #00c9ff; }
+  83%  { color: #ff4b2b; }
+  100% { color: #ff6ec4; }
+}

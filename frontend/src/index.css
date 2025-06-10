@@ -1,0 +1,31 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden; /* previene scroll globale */
+}
+
+.content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.banner, .navbar, .footer {
+  flex-shrink: 0;
+}
+
+/* Temi */
+body.dark-theme {
+  background-color: #121212;
+  color: #eee;
+}
+
+body.light-theme {
+  background-color: #fff;
+  color: #121212;
+}
