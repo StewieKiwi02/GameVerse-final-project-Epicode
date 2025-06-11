@@ -93,7 +93,6 @@ const Contatti = ({ theme }) => {
         </Form>
       </div>
 
-      {/* CSS placeholder inline */}
       <style>
         {`
           .custom-placeholder::placeholder {

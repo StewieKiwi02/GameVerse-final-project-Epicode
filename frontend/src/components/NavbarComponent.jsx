@@ -67,7 +67,7 @@ const NavbarComponent = ({ theme, setTheme, user, setUser, onSearchChange }) => 
             <Dropdown.Item onClick={toggleTheme}>
               <span className="me-2">{theme === "dark" ? <BsMoon /> : <BsSun />}</span> Tema
             </Dropdown.Item>
-            <Dropdown.Item as={Link} to="#"><BsBook className="me-2" /> La mia libreria</Dropdown.Item>
+            <Dropdown.Item as={Link} to="/my-library"><BsBook className="me-2" /> La mia libreria</Dropdown.Item>
             <Dropdown.Item as={Link} to="/aggiungi-gioco"><BsPlusCircle className="me-2" /> Aggiungi gioco</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>

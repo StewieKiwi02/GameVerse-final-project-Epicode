@@ -12,6 +12,9 @@ import Contatti from './pages/Contatti';
 import Privacy from './pages/Privacy';
 import Termini from './pages/Termini';
 import AddGamePage from './pages/AddGamePage';
+import MyLibrary from './pages/MyLibrary';
+import GameDetails from './pages/GameDetails';
+import GlobalLibrary from './components/GlobalLibrary';  // Importa qui il componente
 
 const BANNER_HEIGHT = 60;
 const NAVBAR_HEIGHT = 60;
@@ -39,7 +42,7 @@ function HomeLayout({ theme, user, setTheme, setUser }) {
           overflowY: 'auto',
           width: '100%',
           padding: '1rem',
-          marginBottom: NAVBAR_HEIGHT,
+          marginBottom: 0,  // tolto marginBottom come richiesto
         }}
       >
         <Outlet />
@@ -61,13 +64,26 @@ function PlainLayout() {
 function AppRoutes({ theme, user, setUser, setTheme }) {
   return (
     <Routes>
-      <Route element={<HomeLayout theme={theme} user={user} setTheme={setTheme} setUser={setUser} />}>
-        <Route path="/" element={<></>} />
+      {/* Route padre con '/*' per abilitare annidamenti */}
+      <Route path="/*" element={<HomeLayout theme={theme} user={user} setTheme={setTheme} setUser={setUser} />}>
+        {/* Root: mostra GlobalLibrary */}
+        <Route index element={<GlobalLibrary theme={theme} user={user} />} />
+
+        {/* Dettagli gioco */}
+        <Route
+          path="games/:gameId"
+          element={
+            <PrivateRoute user={user}>
+              <GameDetails theme={theme} user={user} />
+            </PrivateRoute>
+          }
+        />
       </Route>
 
-      <Route element={<PlainLayout />}>
+      {/* Layout semplice per pagine standalone */}
+      <Route path="/*" element={<PlainLayout />}>
         <Route
-          path="/profile"
+          path="profile"
           element={
             <PrivateRoute user={user}>
               <ProfilePage theme={theme} />
@@ -75,22 +91,32 @@ function AppRoutes({ theme, user, setUser, setTheme }) {
           }
         />
         <Route
-          path="/aggiungi-gioco"
+          path="aggiungi-gioco"
           element={
             <PrivateRoute user={user}>
               <AddGamePage theme={theme} />
             </PrivateRoute>
           }
         />
-        <Route path="/contatti" element={<Contatti theme={theme} />} />
-        <Route path="/privacy" element={<Privacy theme={theme} />} />
-        <Route path="/termini" element={<Termini theme={theme} />} />
+        <Route
+          path="my-library"
+          element={
+            <PrivateRoute user={user}>
+              <MyLibrary theme={theme} user={user} />
+            </PrivateRoute>
+          }
+        />
+        <Route path="contatti" element={<Contatti theme={theme} />} />
+        <Route path="privacy" element={<Privacy theme={theme} />} />
+        <Route path="termini" element={<Termini theme={theme} />} />
       </Route>
 
-      <Route path="/register" element={<Register theme={theme} setUser={setUser} />} />
-      <Route path="/login" element={<Login theme={theme} setUser={setUser} />} />
-      <Route path="/login-success" element={<LoginSuccess theme={theme} setUser={setUser} />} />
+      {/* Pagine di autenticazione senza layout */}
+      <Route path="register" element={<Register theme={theme} setUser={setUser} />} />
+      <Route path="login" element={<Login theme={theme} setUser={setUser} />} />
+      <Route path="login-success" element={<LoginSuccess theme={theme} setUser={setUser} />} />
 
+      {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

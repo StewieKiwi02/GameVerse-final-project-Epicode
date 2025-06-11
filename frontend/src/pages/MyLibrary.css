@@ -1,0 +1,12 @@
+.library-title {
+  font-weight: 700;
+  /* aggiungi pure altro stile se vuoi */
+}
+
+.library-title.light {
+  color: #007bff; /* blu bootstrap */
+}
+
+.library-title.dark {
+  color: #61dafb; /* azzurro chiaro */
+}
