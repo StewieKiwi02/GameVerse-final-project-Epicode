@@ -14,7 +14,7 @@ import Termini from './pages/Termini';
 import AddGamePage from './pages/AddGamePage';
 import MyLibrary from './pages/MyLibrary';
 import GameDetails from './pages/GameDetails';
-import GlobalLibrary from './components/GlobalLibrary';  // Importa qui il componente
+import GlobalLibrary from './components/GlobalLibrary';
 
 const BANNER_HEIGHT = 60;
 const NAVBAR_HEIGHT = 60;
@@ -23,7 +23,7 @@ const PrivateRoute = ({ user, children }) => {
   return user ? children : <Navigate to="/login" replace />;
 };
 
-function HomeLayout({ theme, user, setTheme, setUser }) {
+function HomeLayout({ theme, user, setTheme, setUser, searchTerm, setSearchTerm }) {
   return (
     <div className={`main-layout ${theme}-theme`} style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <header
@@ -33,7 +33,14 @@ function HomeLayout({ theme, user, setTheme, setUser }) {
         <TitleBanner username={user?.username} />
       </header>
 
-      <NavbarComponent theme={theme} setTheme={setTheme} user={user} setUser={setUser} />
+      <NavbarComponent
+        theme={theme}
+        setTheme={setTheme}
+        user={user}
+        setUser={setUser}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
 
       <main
         style={{
@@ -42,7 +49,7 @@ function HomeLayout({ theme, user, setTheme, setUser }) {
           overflowY: 'auto',
           width: '100%',
           padding: '1rem',
-          marginBottom: 0,  // tolto marginBottom come richiesto
+          marginBottom: 0,
         }}
       >
         <Outlet />
@@ -61,15 +68,24 @@ function PlainLayout() {
   );
 }
 
-function AppRoutes({ theme, user, setUser, setTheme }) {
+function AppRoutes({ theme, user, setUser, setTheme, searchTerm, setSearchTerm }) {
   return (
     <Routes>
-      {/* Route padre con '/*' per abilitare annidamenti */}
-      <Route path="/*" element={<HomeLayout theme={theme} user={user} setTheme={setTheme} setUser={setUser} />}>
-        {/* Root: mostra GlobalLibrary */}
-        <Route index element={<GlobalLibrary theme={theme} user={user} />} />
+      <Route
+        path="/*"
+        element={
+          <HomeLayout
+            theme={theme}
+            user={user}
+            setTheme={setTheme}
+            setUser={setUser}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+          />
+        }
+      >
+        <Route index element={<GlobalLibrary theme={theme} user={user} searchTerm={searchTerm} />} />
 
-        {/* Dettagli gioco */}
         <Route
           path="games/:gameId"
           element={
@@ -80,7 +96,6 @@ function AppRoutes({ theme, user, setUser, setTheme }) {
         />
       </Route>
 
-      {/* Layout semplice per pagine standalone */}
       <Route path="/*" element={<PlainLayout />}>
         <Route
           path="profile"
@@ -111,12 +126,10 @@ function AppRoutes({ theme, user, setUser, setTheme }) {
         <Route path="termini" element={<Termini theme={theme} />} />
       </Route>
 
-      {/* Pagine di autenticazione senza layout */}
       <Route path="register" element={<Register theme={theme} setUser={setUser} />} />
       <Route path="login" element={<Login theme={theme} setUser={setUser} />} />
       <Route path="login-success" element={<LoginSuccess theme={theme} setUser={setUser} />} />
 
-      {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
@@ -125,6 +138,7 @@ function AppRoutes({ theme, user, setUser, setTheme }) {
 function App() {
   const [theme, setTheme] = useState('dark');
   const [user, setUser] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -176,7 +190,16 @@ function App() {
     };
   }, [location, navigate, user]);
 
-  return <AppRoutes theme={theme} user={user} setUser={setUser} setTheme={setTheme} />;
+  return (
+    <AppRoutes
+      theme={theme}
+      user={user}
+      setUser={setUser}
+      setTheme={setTheme}
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+    />
+  );
 }
 
 export default App;

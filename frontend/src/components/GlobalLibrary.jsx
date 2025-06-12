@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Card, Button, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 const PAGE_SIZE = 12;
 
-const GlobalLibrary = ({ theme, user }) => {
+const GlobalLibrary = ({ theme, user, searchTerm }) => {
   const navigate = useNavigate();
   const [games, setGames] = useState([]);
   const [page, setPage] = useState(1);
@@ -12,42 +12,75 @@ const GlobalLibrary = ({ theme, user }) => {
   const [hasMore, setHasMore] = useState(true);
   const [savingIds, setSavingIds] = useState(new Set());
 
-  const fetchGames = useCallback(async (pageNum) => {
+  // Funzione fetch senza dipendenze variabili
+  const fetchGamesPage = useCallback(async (pageNum) => {
     setLoading(true);
     try {
       const res = await fetch(`/api/games?page=${pageNum}&limit=${PAGE_SIZE}`);
       if (!res.ok) throw new Error('Errore caricamento giochi');
       const data = await res.json();
-
-      // Gestione dati flessibile: se data è array o oggetto con campo games
       const gamesData = Array.isArray(data) ? data : (data.games ?? []);
-
       setGames(prev => pageNum === 1 ? gamesData : [...prev, ...gamesData]);
       setHasMore(gamesData.length === PAGE_SIZE);
     } catch (error) {
       console.error(error);
-      setGames([]);  // resettare giochi se errore
+      setGames([]);
       setHasMore(false);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    fetchGames(page);
-  }, [page, fetchGames]);
+  // Funzione fetch per ricerca (senza pagina)
+  const fetchGamesSearch = useCallback(async (query) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/games/search?q=${encodeURIComponent(query)}`);
+      if (!res.ok) throw new Error('Errore caricamento giochi');
+      const data = await res.json();
+      const gamesData = Array.isArray(data) ? data : (data.games ?? []);
+      setGames(gamesData);
+      setHasMore(false);
+    } catch (error) {
+      console.error(error);
+      setGames([]);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  // Effetto per paginazione - attivo solo se non c'è ricerca
   useEffect(() => {
-    if (!hasMore || loading) return;
-    function handleScroll() {
+    if (!searchTerm || searchTerm.trim().length === 0) {
+      fetchGamesPage(page);
+    }
+  }, [page, searchTerm, fetchGamesPage]);
+
+  // Effetto per ricerca - attivo solo se c'è ricerca
+  useEffect(() => {
+    if (searchTerm && searchTerm.trim().length > 0) {
+      fetchGamesSearch(searchTerm.trim());
+      setPage(1); // reset pagina per sicurezza
+    }
+  }, [searchTerm, fetchGamesSearch]);
+
+  // Scroll infinito solo se non c'è ricerca attiva
+  useEffect(() => {
+    if (searchTerm && searchTerm.trim().length > 0) return;
+
+    const handleScroll = () => {
+      if (loading || !hasMore) return;
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
         setPage(prev => prev + 1);
       }
-    }
+    };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [hasMore, loading]);
+  }, [loading, hasMore, searchTerm]);
 
+  // Salvataggio gioco (stessa logica)
   const handleSaveGame = async (gameId) => {
     if (!user) {
       alert('Devi essere loggato per salvare giochi.');
