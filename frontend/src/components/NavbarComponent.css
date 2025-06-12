@@ -1,146 +1,107 @@
+/* === Navbar base === */
 .custom-navbar {
   position: fixed;
   top: 70px;
   left: 0;
   width: 100%;
   height: 55px;
-  min-height: 55px;
-  max-height: 55px;
   z-index: 1060;
-  margin-top: 0;
-  overflow: visible;
-  transition: background-color 0.3s ease;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding: 0 1rem;
+  background-color: inherit;
+  display: flex;
+  align-items: center;
 }
 
+/* === Contenitore navbar === */
 .navbar-container {
-  position: relative;
   display: flex !important;
-  align-items: center;
-  justify-content: space-between;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: nowrap !important;
   width: 100%;
+  gap: 1rem;
   padding: 0;
 }
 
-/* Dropdown toggle margini */
+/* === Dropdown sinistra === */
 .custom-dropdown-toggle {
-  margin-left: 0.5rem;
   border: 2px solid #6c757d;
   color: #6c757d;
-  background-color: transparent;
+  background: transparent;
   padding: 6px 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
   border-radius: 6px;
-  font-size: 24px;
+  font-size: 22px;
+  display: flex;
   justify-content: center;
-  width: 60px;
+  align-items: center;
+  width: 50px;
   height: 40px;
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 1051;
+  cursor: pointer;
 }
 
 .custom-dropdown-toggle::after {
   display: none !important;
 }
 
-.custom-dropdown-toggle:hover,
-.custom-dropdown-toggle:focus,
-.custom-dropdown-toggle.active,
-.custom-dropdown-toggle.show {
+.custom-dropdown-toggle:hover {
   background-color: #6c757d;
-  color: white !important;
-  border-color: #6c757d !important;
-  outline: none;
-  box-shadow: none !important;
-  position: relative;
-  z-index: 1051;
+  color: white;
+  border-color: #6c757d;
 }
 
-/* Tema dark dropdown toggle */
 .navbar-dark .custom-dropdown-toggle,
-.navbar-dark .custom-dropdown-toggle:hover,
-.navbar-dark .custom-dropdown-toggle:focus,
-.navbar-dark .custom-dropdown-toggle.active,
-.navbar-dark .custom-dropdown-toggle.show {
+.navbar-dark .custom-dropdown-toggle:hover {
   color: #adb5bd !important;
   border-color: #adb5bd !important;
   background-color: transparent !important;
-  z-index: 1051;
 }
 
-/* Dropdown menu z-index */
-.dropdown-menu {
-  z-index: 1050;
-}
-
-/* Tema dark dropdown menu */
-.navbar-dark .dropdown-menu {
-  background-color: #343a40;
-  border: 1px solid #495057;
-}
-
-.navbar-dark .dropdown-item {
-  color: #f8f9fa;
-}
-
-.navbar-dark .dropdown-item:hover,
-.navbar-dark .dropdown-item:focus {
-  background-color: #495057;
-  color: #ffffff;
-}
-
-/* Barra di ricerca container centrata assoluta */
+/* === Barra di ricerca === */
 .search-container {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 400px;
-  max-width: 80vw;
-  z-index: 1100;
+  flex: 1 1 auto;
+  max-width: 500px;
+  display: flex;
+  justify-content: center;
+  min-width: 150px;
 }
 
-/* Input ricerca */
 .search-container input[type="search"] {
   width: 100%;
   border-radius: 6px;
   padding: 6px 12px;
-  box-sizing: border-box;
   border: 1px solid #ced4da;
-  transition: border-color 0.3s ease;
+  box-sizing: border-box;
 }
 
-/* Cambia bordo input in base al tema */
 .navbar-dark .search-container input[type="search"] {
   background-color: #212529;
   color: #f8f9fa;
   border-color: #495057;
 }
 
-.navbar-dark .search-container input[type="search"]::placeholder {
+.navbar-dark .search-container input::placeholder {
   color: #adb5bd;
 }
 
-.navbar-light .search-container input[type="search"]::placeholder {
+.navbar-light .search-container input::placeholder {
   color: #6c757d;
 }
 
-/* Dropdown risultati ricerca */
+/* === Dropdown risultati ricerca === */
 .search-results-dropdown {
-  background-color: white;
-  color: black;
-  max-height: 300px;
-  overflow-y: auto;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  background: white;
   border: 1px solid #ced4da;
   border-radius: 6px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  z-index: 1100;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Dropdown risultati dark mode */
 .navbar-dark .search-results-dropdown {
   background-color: #212529;
   color: #f8f9fa;
@@ -148,14 +109,11 @@
   box-shadow: 0 4px 8px rgba(0,0,0,0.7);
 }
 
-/* Singolo risultato */
 .search-result-item {
   padding: 8px 12px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
-/* Hover risultato */
 .search-result-item:hover {
   background-color: #e9ecef;
   color: #212529;
@@ -163,52 +121,91 @@
 
 .navbar-dark .search-result-item:hover {
   background-color: #495057;
-  color: #fff;
+  color: white;
 }
 
-/* Avatar margine */
-.navbar-dark .nav-link img,
-.navbar-light .nav-link img {
-  margin-right: 0.5rem;
-  cursor: pointer;
+/* === Pulsanti login / signin + avatar === */
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-/* Pulsanti login/signin */
+.custom-login-btn,
+.custom-signin-btn {
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  margin: 0 !important; /* 🔥 Elimina ogni margine esterno */
+}
+
 .custom-login-btn {
   border: 2px solid #6c757d;
   color: #6c757d;
-  background-color: transparent;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
+  background: transparent;
 }
 
 .custom-login-btn:hover {
-  background-color: #6c757d;
+  background: #6c757d;
   color: white;
 }
 
 .custom-signin-btn {
   border: 2px solid #dc3545;
   color: #dc3545;
-  background-color: transparent;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
+  background: transparent;
 }
 
 .custom-signin-btn:hover {
-  background-color: #dc3545;
+  background: #dc3545;
   color: white;
 }
 
-/* Responsive: su schermi piccoli, barra ricerca più stretta */
+.navbar-nav img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+/* === Responsive Tablet (max 768px) === */
+@media (max-width: 768px) {
+  .search-container {
+    max-width: 45vw;
+  }
+
+  .custom-login-btn,
+  .custom-signin-btn {
+    font-size: 13px;
+    padding: 5px 8px;
+  }
+
+  .navbar-nav img {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* === Responsive Telefono (max 576px) === */
 @media (max-width: 576px) {
   .search-container {
-    width: 90vw;
+    max-width: 40vw;
+  }
+
+  .custom-login-btn,
+  .custom-signin-btn {
+    font-size: 12px;
+    padding: 4px 6px;
+  }
+
+  .navbar-nav img {
+    width: 32px;
+    height: 32px;
   }
 }

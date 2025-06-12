@@ -71,7 +71,7 @@ const NavbarComponent = ({ theme, setTheme, user, setUser }) => {
       expand="lg"
       className={`custom-navbar ${theme === "dark" ? "navbar-dark bg-dark" : "navbar-light bg-light"}`}
     >
-      <Container fluid className="navbar-container d-flex align-items-center justify-content-between">
+      <Container fluid className="navbar-container d-flex align-items-center justify-content-between flex-nowrap">
         {/* Dropdown a sinistra */}
         <Dropdown className="me-3 flex-shrink-0">
           <Dropdown.Toggle as="div" className="btn custom-dropdown-toggle" role="button">
@@ -87,7 +87,7 @@ const NavbarComponent = ({ theme, setTheme, user, setUser }) => {
         </Dropdown>
 
         {/* Barra di ricerca centrata assoluta */}
-        <div className="search-container position-absolute">
+        <div className="search-container flex-grow-1 d-flex justify-content-center">
           <Form.Control
             id="search-input"
             name="search"
@@ -117,17 +117,22 @@ const NavbarComponent = ({ theme, setTheme, user, setUser }) => {
         </div>
 
         {/* Avatar a destra */}
-        <Nav className="ms-auto d-flex align-items-center flex-shrink-0">
+        <Nav className="d-flex align-items-center flex-shrink-0">
           {user ? (
             <Nav.Link as={Link} to="/profile" className="p-0">
               <Image
-                src={user.profile || defaultAvatar}
+                src={
+                  user.profilePic
+                    ? user.profilePic
+                    : "/assets/profile/Nothing Profile.jpg"
+                }
                 roundedCircle
                 width="40"
                 height="40"
                 alt="Profile"
                 style={{ objectFit: "cover", cursor: "pointer" }}
               />
+
             </Nav.Link>
           ) : (
             <>

@@ -22,7 +22,7 @@ function GameDetails({ theme, user }) {
   const [commentContent, setCommentContent] = useState('');
   const [commentRating, setCommentRating] = useState(5);
   const [loadingGame, setLoadingGame] = useState(true);
-  const [loadingComments, setLoadingComments] = useState(true);
+  const [loadingComments, setLoadingComments] = useState(false);
   const [postingComment, setPostingComment] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMoreComments, setHasMoreComments] = useState(true);
@@ -45,7 +45,7 @@ function GameDetails({ theme, user }) {
     fetchGame();
   }, [gameId]);
 
-  // Fetch comments (paginated, infinite scroll)
+  // Fetch comments paginati
   useEffect(() => {
     async function fetchComments() {
       if (!hasMoreComments) return;
@@ -66,9 +66,9 @@ function GameDetails({ theme, user }) {
       }
     }
     fetchComments();
-  }, [gameId, page, hasMoreComments]);
+  }, [gameId, page]); // tolto hasMoreComments da dipendenze per evitare loop
 
-  // Infinite scroll for comments
+  // Infinite scroll per i commenti
   useEffect(() => {
     function handleScroll() {
       if (
@@ -84,13 +84,13 @@ function GameDetails({ theme, user }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [loadingComments, hasMoreComments]);
 
-  // Calculate average rating from comments
+  // Calcola rating medio
   const averageRating =
     comments.length > 0
       ? comments.reduce((acc, c) => acc + c.rating, 0) / comments.length
       : 0;
 
-  // Render stars for average rating (rounded)
+  // Render stelle rating
   const renderStars = (rating) => {
     const fullStars = Math.round(rating);
     return [...Array(5)].map((_, i) => (
@@ -100,7 +100,7 @@ function GameDetails({ theme, user }) {
     ));
   };
 
-  // Handle comment submission
+  // Submit commento
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
@@ -144,7 +144,7 @@ function GameDetails({ theme, user }) {
     }
   };
 
-  // Handle comment deletion (admin only)
+  // Elimina commento (solo admin)
   const handleDeleteComment = async (commentId) => {
     if (!window.confirm('Sei sicuro di voler eliminare questo commento?')) return;
     try {
@@ -183,11 +183,14 @@ function GameDetails({ theme, user }) {
 
   return (
     <Container fluid className={`${theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'}`} style={{ minHeight: '100vh', paddingTop: '1rem' }}>
-      {/* Upper half */}
       <Row className="mb-4">
-        {/* Left: Image + Trailer link */}
         <Col md={3} className="mb-3">
-          <Image src={game.coverImage} alt={`${game.title} cover`} fluid rounded />
+          <Image 
+            src={game.coverImage || '/assets/games/placeholder.jpg'} 
+            alt={`${game.title} cover`} 
+            fluid 
+            rounded 
+          />
           {game.trailerUrl && (
             <a
               href={game.trailerUrl}
@@ -201,12 +204,11 @@ function GameDetails({ theme, user }) {
           )}
         </Col>
 
-        {/* Center: info */}
         <Col md={6}>
           <h2>{game.title}</h2>
           <p>{game.description}</p>
           <p><strong>Produttore:</strong> {game.producer}</p>
-          <p><strong>Data di rilascio:</strong> {new Date(game.releaseDate).toLocaleDateString()}</p>
+          <p><strong>Data di rilascio:</strong> {new Date(game.releaseDate).toLocaleDateString('it-IT')}</p>
           <p><strong>Categoria:</strong> {game.category.map(cat => cat.category).join(', ')}</p>
           <p><strong>Piattaforme:</strong> {game.platforms.map(p => p.platform).join(', ')}</p>
           <p><strong>Genere:</strong> {game.genre.map(g => g.genre).join(', ')}</p>
@@ -237,7 +239,6 @@ function GameDetails({ theme, user }) {
           <p><strong>PEGI:</strong> {game.pegi}</p>
         </Col>
 
-        {/* Right: Comment form */}
         <Col md={3}>
           {user ? (
             <Form onSubmit={handleCommentSubmit}>
@@ -251,6 +252,7 @@ function GameDetails({ theme, user }) {
                   onChange={(e) => setCommentContent(e.target.value)}
                   placeholder="Inserisci il tuo commento qui..."
                   required
+                  disabled={postingComment}
                 />
               </Form.Group>
 
@@ -261,6 +263,7 @@ function GameDetails({ theme, user }) {
                   onChange={(e) => setCommentRating(Number(e.target.value))}
                   required
                   aria-label="Seleziona una valutazione da 1 a 5"
+                  disabled={postingComment}
                 >
                   {[5,4,3,2,1].map((val) => (
                     <option key={val} value={val}>{val} stelle</option>
@@ -268,7 +271,7 @@ function GameDetails({ theme, user }) {
                 </Form.Select>
               </Form.Group>
 
-              <Button type="submit" disabled={postingComment} className="w-100">
+              <Button type="submit" disabled={postingComment || !commentContent.trim()} className="w-100">
                 {postingComment ? 'Pubblicazione...' : 'Pubblica Commento'}
               </Button>
             </Form>
@@ -278,7 +281,6 @@ function GameDetails({ theme, user }) {
         </Col>
       </Row>
 
-      {/* Lower half: Comments list */}
       <div
         className={`pt-4 mt-4 border-top ${theme === 'dark' ? 'border-light' : 'border-dark'}`}
         style={{ backgroundColor: theme === 'dark' ? '#1a1a1a' : '#f8f9fa' }}

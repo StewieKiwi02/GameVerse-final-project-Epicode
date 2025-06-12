@@ -238,7 +238,6 @@ const ProfilePage = ({ theme = "light" }) => {
     }
   };
 
-  // Funzione per diventare admin tramite password .env
 const handleBecomeAdmin = async () => {
   setAdminError("");
   if (!adminPw) {
@@ -248,7 +247,7 @@ const handleBecomeAdmin = async () => {
   try {
     const { data } = await axios.post(
       `${import.meta.env.VITE_API_URL}/api/users/become-admin`,
-      { adminPw: adminPw }, // <-- qui deve esserci la password
+      { adminPw: adminPw }, 
       { headers: { Authorization: `Bearer ${token}` } }
     );
     if (data.success) {
@@ -334,28 +333,30 @@ const handleBecomeAdmin = async () => {
               boxShadow: "0 0 0 6px rgba(0,0,0,0.07)",
             }}
           >
-            <Image
-              src={
-                profile.profilePic && typeof profile.profilePic === "string"
-                  ? profile.profilePic
-                  : "https://ui-avatars.com/api/?name=User&background=bbb&color=fff&rounded=true"
-              }
-              alt="Profilo"
-              roundedCircle
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
+           <Image
+            src={
+              profile.profilePic && typeof profile.profilePic === 'string'
+                ? profile.profilePic
+                : '/assets/profile/Nothing Profile.jpg'
+            }
+            alt="Profilo"
+            roundedCircle
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
           </div>
         </div>
 
         {/* Pulsanti cambia banner e foto profilo */}
-        <div className="d-flex justify-content-between mb-4" style={{ marginTop: "5rem" }}>
-          <div style={{ marginLeft: "32px", marginTop: "10px" }}>
+        <div className="d-flex justify-content-between align-items-start flex-wrap mb-4" style={{ marginTop: "5rem", gap: "1rem" }}>
+          <div className="text-center" style={{ marginLeft: "20px" }}>
+            <p className="mb-2 fw-semibold">Foto profilo</p>
             <ImageUpload
               onChange={(file) => handleImageChange("profilePic", file)}
               disabled={!editMode}
             />
           </div>
-          <div style={{ marginRight: "32px", marginTop: "10px" }}>
+          <div className="text-center" style={{ marginRight: "20px", marginTop: "-80PX" }}>
+            <p className="mb-2 fw-semibold">Banner profilo</p>
             <ImageUpload
               onChange={(file) => handleImageChange("banner", file)}
               disabled={!editMode}

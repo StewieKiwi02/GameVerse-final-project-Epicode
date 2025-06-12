@@ -25,7 +25,10 @@ const PrivateRoute = ({ user, children }) => {
 
 function HomeLayout({ theme, user, setTheme, setUser, searchTerm, setSearchTerm }) {
   return (
-    <div className={`main-layout ${theme}-theme`} style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div
+      className={`main-layout ${theme}-theme`}
+      style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}
+    >
       <header
         className="fixed-top d-flex align-items-center"
         style={{ height: BANNER_HEIGHT, zIndex: 1060, width: '100%', padding: '0 1rem' }}
@@ -72,7 +75,7 @@ function AppRoutes({ theme, user, setUser, setTheme, searchTerm, setSearchTerm }
   return (
     <Routes>
       <Route
-        path="/*"
+        path="/"
         element={
           <HomeLayout
             theme={theme}
@@ -85,7 +88,9 @@ function AppRoutes({ theme, user, setUser, setTheme, searchTerm, setSearchTerm }
         }
       >
         <Route index element={<GlobalLibrary theme={theme} user={user} searchTerm={searchTerm} />} />
+      </Route>
 
+      <Route path="/" element={<PlainLayout />}>
         <Route
           path="games/:gameId"
           element={
@@ -94,9 +99,6 @@ function AppRoutes({ theme, user, setUser, setTheme, searchTerm, setSearchTerm }
             </PrivateRoute>
           }
         />
-      </Route>
-
-      <Route path="/*" element={<PlainLayout />}>
         <Route
           path="profile"
           element={
@@ -180,15 +182,18 @@ function App() {
       });
     } else {
       const token = localStorage.getItem('token');
-      if (token && !user) {
+      if (token) {
         fetchUserFromToken(token);
+      } else {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) setUser(JSON.parse(storedUser));
       }
     }
 
     return () => {
       isMounted = false;
     };
-  }, [location, navigate, user]);
+  }, [location, navigate]);
 
   return (
     <AppRoutes

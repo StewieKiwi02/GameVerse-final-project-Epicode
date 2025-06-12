@@ -6,81 +6,99 @@ const PAGE_SIZE = 12;
 
 const GlobalLibrary = ({ theme, user, searchTerm }) => {
   const navigate = useNavigate();
+
   const [games, setGames] = useState([]);
+  const [totalGames, setTotalGames] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
   const [savingIds, setSavingIds] = useState(new Set());
 
-  // Funzione fetch senza dipendenze variabili
-  const fetchGamesPage = useCallback(async (pageNum) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/games?page=${pageNum}&limit=${PAGE_SIZE}`);
-      if (!res.ok) throw new Error('Errore caricamento giochi');
-      const data = await res.json();
-      const gamesData = Array.isArray(data) ? data : (data.games ?? []);
-      setGames(prev => pageNum === 1 ? gamesData : [...prev, ...gamesData]);
-      setHasMore(gamesData.length === PAGE_SIZE);
-    } catch (error) {
-      console.error(error);
-      setGames([]);
-      setHasMore(false);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const hasMore = games.length < totalGames;
 
-  // Funzione fetch per ricerca (senza pagina)
+  const fetchGamesPage = useCallback(async (pageNum) => {
+  setLoading(true);
+  try {
+    const res = await fetch(`/api/games?page=${pageNum}&limit=${PAGE_SIZE}`);
+    if (!res.ok) throw new Error('Errore caricamento giochi');
+    const data = await res.json();
+
+    console.log('[DEBUG] fetchGamesPage response raw:', data);
+
+    // Ora data è un array (non { games, total }), aggiorna quindi così:
+    const gamesData = Array.isArray(data) ? data : [];
+    const total = 9999; // Metti un valore alto fittizio per disabilitare il controllo per ora
+
+    console.log('[DEBUG] parsed games:', gamesData);
+    console.log('[DEBUG] parsed total:', total);
+
+    setGames(prev => pageNum === 1 ? gamesData : [...prev, ...gamesData]);
+    setTotalGames(total);
+  } catch (error) {
+    console.error('[DEBUG] fetchGamesPage error:', error);
+    setGames([]);
+    setTotalGames(0);
+  } finally {
+    setLoading(false);
+  }
+}, []);
+
   const fetchGamesSearch = useCallback(async (query) => {
     setLoading(true);
     try {
       const res = await fetch(`/api/games/search?q=${encodeURIComponent(query)}`);
       if (!res.ok) throw new Error('Errore caricamento giochi');
       const data = await res.json();
-      const gamesData = Array.isArray(data) ? data : (data.games ?? []);
+
+      const gamesData = Array.isArray(data.games) ? data.games : (Array.isArray(data) ? data : []);
+      const total = typeof data.total === 'number' ? data.total : gamesData.length;
+
       setGames(gamesData);
-      setHasMore(false);
+      setTotalGames(total);
     } catch (error) {
-      console.error(error);
+      console.error('Errore fetchGamesSearch:', error);
       setGames([]);
-      setHasMore(false);
+      setTotalGames(0);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Effetto per paginazione - attivo solo se non c'è ricerca
+  // reset page on search term change
+  useEffect(() => {
+    if (searchTerm && searchTerm.trim().length > 0) {
+      setPage(1);
+    }
+  }, [searchTerm]);
+
+  // fetch paginated games only if no search term
   useEffect(() => {
     if (!searchTerm || searchTerm.trim().length === 0) {
       fetchGamesPage(page);
     }
   }, [page, searchTerm, fetchGamesPage]);
 
-  // Effetto per ricerca - attivo solo se c'è ricerca
+  // fetch games by search term
   useEffect(() => {
     if (searchTerm && searchTerm.trim().length > 0) {
       fetchGamesSearch(searchTerm.trim());
-      setPage(1); // reset pagina per sicurezza
     }
   }, [searchTerm, fetchGamesSearch]);
 
-  // Scroll infinito solo se non c'è ricerca attiva
+  // infinite scroll only if no search term
   useEffect(() => {
     if (searchTerm && searchTerm.trim().length > 0) return;
 
-    const handleScroll = () => {
+    const onScroll = () => {
       if (loading || !hasMore) return;
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
         setPage(prev => prev + 1);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, [loading, hasMore, searchTerm]);
 
-  // Salvataggio gioco (stessa logica)
   const handleSaveGame = async (gameId) => {
     if (!user) {
       alert('Devi essere loggato per salvare giochi.');
@@ -92,11 +110,14 @@ const GlobalLibrary = ({ theme, user, searchTerm }) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('Token mancante');
+
       const res = await fetch(`/api/users/library/${gameId}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
+
       if (!res.ok) throw new Error('Errore nel salvataggio');
+
       alert('Gioco salvato nella tua libreria!');
     } catch (error) {
       console.error(error);
@@ -111,15 +132,8 @@ const GlobalLibrary = ({ theme, user, searchTerm }) => {
   };
 
   return (
-    <Container
-      fluid
-      className={theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'}
-      style={{ minHeight: 'calc(100vh - 120px)', paddingTop: '1rem' }}
-    >
-      <h3
-        className="mb-4"
-        style={{ fontWeight: '700', color: theme === 'dark' ? '#61dafb' : '#007bff' }}
-      >
+    <Container fluid className={theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'} style={{ minHeight: 'calc(100vh - 120px)', paddingTop: '1rem' }}>
+      <h3 className="mb-4" style={{ fontWeight: '700', color: theme === 'dark' ? '#61dafb' : '#007bff' }}>
         Libreria globale di GameVerse
       </h3>
 
@@ -129,10 +143,7 @@ const GlobalLibrary = ({ theme, user, searchTerm }) => {
             <Col key={game._id}>
               <Card
                 className={`h-100 ${theme === 'dark' ? 'bg-secondary text-light' : 'bg-white text-dark'}`}
-                style={{
-                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                  cursor: 'pointer',
-                }}
+                style={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease', cursor: 'pointer' }}
                 onMouseEnter={e => {
                   e.currentTarget.style.transform = 'scale(1.05)';
                   e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.3)';
@@ -144,7 +155,7 @@ const GlobalLibrary = ({ theme, user, searchTerm }) => {
               >
                 <Card.Img
                   variant="top"
-                  src={game.coverImage || 'https://via.placeholder.com/300x180?text=No+Image'}
+                  src={game.coverImage ? import.meta.env.BASE_URL + game.coverImage : 'https://via.placeholder.com/300x180?text=No+Image'}
                   alt={`${game.title} cover`}
                   style={{ height: '180px', objectFit: 'cover' }}
                   onClick={() => navigate(`/games/${game._id}`)}
