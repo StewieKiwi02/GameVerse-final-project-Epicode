@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const Platform = require('../models/Platform'); 
+const Platform = require('../models/Platform');
 
 const platforms = [
   "PlayStation 5",
@@ -43,17 +43,18 @@ const seedPlatforms = async () => {
     await mongoose.connect(process.env.MONGO_URL);
     console.log('Connesso al DB per il seeding delle piattaforme');
 
-    // Opzionale: cancella le piattaforme esistenti se vuoi pulire la collection
+    // Pulizia della collection piattaforme
     await Platform.deleteMany({});
 
     const platformDocs = platforms.map(name => ({ platform: name }));
 
     await Platform.insertMany(platformDocs);
     console.log('Piattaforme inserite con successo!');
-    
-    mongoose.disconnect();
   } catch (error) {
     console.error('Errore nel seeding delle piattaforme:', error);
+  } finally {
+    await mongoose.disconnect();
+    process.exit();
   }
 };
 

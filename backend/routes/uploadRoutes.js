@@ -3,22 +3,22 @@ const router = express.Router();
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 
-// Configura Cloudinary qui se non lo hai già fatto altrove
+// Configura Cloudinary 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Multer con storage in memoria (buffer)
+// Configura multer
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Funzione helper per caricare buffer su Cloudinary con Promise
+// Funzione per caricare il file su Cloudinary
 const uploadToCloudinary = (buffer) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { folder: 'gameverse' }, // cartella opzionale
+      { folder: 'gameverse' },
       (error, result) => {
         if (result) resolve(result);
         else reject(error);

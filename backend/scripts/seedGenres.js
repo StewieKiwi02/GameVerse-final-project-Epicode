@@ -52,18 +52,20 @@ const seedGenres = async () => {
     await mongoose.connect(process.env.MONGO_URL);
     console.log('Connesso al DB');
 
+    // Pulizia collezione per evitare duplicati
     await Genre.deleteMany();
 
     for (const genreName of genres) {
-      const newGenre = new Genre({ genre: genreName });
-      await newGenre.save();
+      await Genre.create({ genre: genreName });
+      console.log(`Inserito genere: ${genreName}`);
     }
 
     console.log('Generi seedati con successo');
-    process.exit();
   } catch (error) {
     console.error('Errore nel seeding dei generi:', error);
-    process.exit(1);
+  } finally {
+    await mongoose.disconnect();
+    process.exit();
   }
 };
 

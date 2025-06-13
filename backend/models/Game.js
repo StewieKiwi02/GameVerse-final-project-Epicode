@@ -4,16 +4,12 @@ const gameSchema = new mongoose.Schema({
 
     title: {
         type: String,
-        require: true,
+        required: true,
         unique: true,
         trim: true,
     },
-    coverImage:{
-        type: String, //URL o public_id Cloudinary
-        required: true,
-    },
-    bannerImage: {
-        type: String, //URL o public_id Cloudinary
+    coverImage: {
+        type: String,
         required: true,
     },
     description: {
@@ -26,9 +22,9 @@ const gameSchema = new mongoose.Schema({
         trim: true,
         required: true,
     },
-    category: [{ //si usa array quando c'è possibilità di più scelte assieme per un unico documento
-        type: mongoose.Schema.Types.ObjectId,// Identificatore univoco (ObjectId) di MongoDB, usato per creare un riferimento a un altro documento in un'altra collezione
-        ref: 'Category', // riferimento allo Schema Category
+    category: [{ 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
         required: true,
     }],
     releaseDate: {
@@ -41,13 +37,13 @@ const gameSchema = new mongoose.Schema({
         required: true,
     }],
     genre: [{
-        type:mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Genre',
         required: true,
     }],
     languages: {
         interface: [{
-            type:mongoose.Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'Language',
             required: true,
         }],
@@ -67,38 +63,43 @@ const gameSchema = new mongoose.Schema({
         min: 1,
         max: 5,
         validate: {
-            validator: Number.isInteger, //funzione built-in di JS che passa true se passa un numero intero, altrimenti da false
+            validator: Number.isInteger,
             message: 'La valutazione deve essere un numero intero tra 1 e 5',
         },
         required: true,
     },
     playMode: {
         type: String,
-        enum: ['singleplayer', 'multiplayer', 'both'], //limita scelta valori a quelli indicati
+        enum: ['singleplayer', 'multiplayer', 'singleplayer-multiplayer'],
         required: true,
     },
     trailerUrl: {
         type: String,
-        required: false, //rende opzionale
+        required: false,
         validate: {
             validator: function(v) {
-            return /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:/?#[\]@!$&'()*+,;=]*)?$/.test(v); // regex semplice per validare URL (https:// o http://)
+                if (!v) return true;
+                return /^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-._~:/?#[\]@!$&'()*+,;=]*)?$/.test(v);
             },
             message: props => `${props.value} non è un URL valido!`
         }
     },
     pegi: {
         type: String,
-        enum: ['3', '7', '12', '16', '18'], // standard PEGI
+        enum: ['3', '7', '12', '16', '18'],
         required: true,
     },
-},
 
-    {
-        timestamps: true,
+    averageRating: {
+        type: Number,
+        default: 1,
+        min: 1,
+        max: 5,
     },
 
-);
+}, {
+    timestamps: true,
+});
 
 const Game = mongoose.model('Game', gameSchema);
 

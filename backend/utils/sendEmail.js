@@ -12,17 +12,17 @@ const sendEmail = async ({ to, subject, text, html }) => {
 
   if (process.env.NODE_ENV === 'development') {
     console.log('💌 EMAIL SIMULATA (non inviata):');
-    console.log(msg);
+    console.log(JSON.stringify(msg, null, 2));
     return;
   }
 
   try {
     await sgMail.send(msg);
-    console.log('✅ Email inviata con successo a', to);
+    console.log(`✅ Email inviata con successo a ${to}`);
   } catch (error) {
-    console.error('❌ Errore invio email:', error);
-    if (error.response) {
-      console.error(error.response.body);
+    console.error('❌ Errore durante l\'invio dell\'email:', error.message);
+    if (error.response && error.response.body) {
+      console.error('Dettagli errore SendGrid:', error.response.body);
     }
     throw error;
   }

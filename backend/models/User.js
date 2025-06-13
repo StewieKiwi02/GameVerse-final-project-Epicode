@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema({
     googleId: {
         type: String,
         unique: true,
-        sparse: true, //permette che alcuni utenti non utilizzino google ma che se lo fanno il loro account google associato sia unico
+        sparse: true,
     },
     isAdmin: {
         type: Boolean,
@@ -47,7 +47,7 @@ const userSchema = new mongoose.Schema({
     themePreference: {
         type: String,
         enum: ['light', 'dark'],
-        default: 'light'
+        default: 'light',
     },
     phone: {
         type: String,
@@ -75,6 +75,10 @@ const userSchema = new mongoose.Schema({
         medium: { type: String, default: '', trim: true },
         github: { type: String, default: '', trim: true },
     },
+    library: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Game',
+    }],
 }, {
     timestamps: true,
 });

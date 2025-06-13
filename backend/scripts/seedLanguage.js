@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const Language = require('../models/Language'); 
+const Language = require('../models/Language');
 
 const languages = [
   { name: 'english', isoCode: 'EN' },
@@ -32,15 +32,16 @@ const seedLanguages = async () => {
     await mongoose.connect(process.env.MONGO_URL);
     console.log('Connesso al database per il seeding delle lingue');
 
-    // Opzionale: cancella le lingue esistenti
+    // Pulizia della collection per evitare duplicati
     await Language.deleteMany({});
 
     await Language.insertMany(languages);
     console.log('Lingue inserite con successo!');
-
-    mongoose.disconnect();
   } catch (error) {
     console.error('Errore nel seeding delle lingue:', error);
+  } finally {
+    await mongoose.disconnect();
+    process.exit();
   }
 };
 

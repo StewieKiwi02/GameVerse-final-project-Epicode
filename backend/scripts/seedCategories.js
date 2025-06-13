@@ -56,9 +56,11 @@ async function seedCategories() {
     }
 
     console.log('Seed completato');
-    await mongoose.disconnect();
   } catch (error) {
     console.error('Errore nel seed delle categorie:', error);
+  } finally {
+    await mongoose.disconnect();
+    process.exit();
   }
 }
 
