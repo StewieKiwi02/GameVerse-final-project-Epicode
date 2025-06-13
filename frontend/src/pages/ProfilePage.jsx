@@ -297,13 +297,10 @@ const handleBecomeAdmin = async () => {
             style={{
               height: 180,
               borderRadius: 16,
-              background: profile.banner
-                ? `url(${
-                    typeof profile.banner === "string" ? profile.banner : ""
-                  }) center/cover no-repeat`
-                : theme === "dark"
-                ? "#23272b"
-                : "#e9ecef",
+              background:
+                profile.banner && typeof profile.banner === "string"
+                  ? `url(${profile.banner}) center/cover no-repeat`
+                  : `url("/assets/profileBanner/Nothing banner.jpg") center/cover no-repeat`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

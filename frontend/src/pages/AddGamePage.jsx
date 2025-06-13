@@ -95,6 +95,7 @@ const AddGamePage = ({ theme }) => {
   const uploadImage = async (file) => {
     const data = new FormData();
     data.append("file", file);
+    data.append("uploadType", "games");
 
     const token = localStorage.getItem("token");
 
