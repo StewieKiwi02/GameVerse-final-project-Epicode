@@ -151,7 +151,17 @@ function App() {
   useEffect(() => {
     let isMounted = true;
 
-    async function fetchUserFromToken(token) {
+    const restoreUserFromLocalStorage = () => {
+      const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      if (storedUser && token) {
+        setUser(JSON.parse(storedUser));
+      } else {
+        setUser(null);
+      }
+    };
+
+    const fetchUserFromToken = async (token) => {
       try {
         const res = await fetch('/api/users/profile', {
           headers: { Authorization: `Bearer ${token}` },
@@ -171,25 +181,22 @@ function App() {
         localStorage.removeItem('user');
         if (isMounted) setUser(null);
       }
-    }
+    };
 
     const params = new URLSearchParams(location.search);
     const tokenFromUrl = params.get('token');
+    const localToken = localStorage.getItem('token');
 
     if (tokenFromUrl) {
       localStorage.setItem('token', tokenFromUrl);
-      setUser(null);
       fetchUserFromToken(tokenFromUrl).then(() => {
         navigate(location.pathname, { replace: true });
       });
+    } else if (localToken && localToken !== "undefined" && localToken !== "null") {
+      restoreUserFromLocalStorage();
+      fetchUserFromToken(localToken);
     } else {
-      const token = localStorage.getItem('token');
-      if (token && token !== "undefined" && token !== "null") {
-        fetchUserFromToken(token);
-      } else {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) setUser(JSON.parse(storedUser));
-      }
+      setUser(null);
     }
 
     return () => {

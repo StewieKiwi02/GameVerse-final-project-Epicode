@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Card, Button, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { BsTrash } from 'react-icons/bs';
 
 const PAGE_SIZE = 12;
 
@@ -31,7 +32,6 @@ const GlobalLibrary = ({ theme, user, searchTerm }) => {
         ? data.total
         : newGames.length;
 
-      // 🔥 Comportamento corretto: sovrascrive se pagina nuova
       if (pageNum === 1 || query) {
         setGames(newGames);
       } else {
@@ -85,6 +85,30 @@ const GlobalLibrary = ({ theme, user, searchTerm }) => {
     }
   };
 
+  const handleDeleteGame = async (gameId) => {
+    const confirmDelete = window.confirm('Sei sicuro di voler eliminare questo gioco?');
+    if (!confirmDelete) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token mancante');
+
+      const res = await fetch(`/api/games/${gameId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error('Errore nella cancellazione');
+      alert('Gioco eliminato con successo!');
+      setGames(prev => prev.filter(g => g._id !== gameId));
+    } catch (error) {
+      console.error('Errore eliminazione gioco:', error);
+      alert('Errore durante l\'eliminazione del gioco.');
+    }
+  };
+
   return (
     <Container
       fluid
@@ -135,6 +159,7 @@ const GlobalLibrary = ({ theme, user, searchTerm }) => {
               />
               <Card.Body className="d-flex flex-column">
                 <Card.Title className="mb-3">{game.title}</Card.Title>
+
                 <Button
                   variant={theme === 'dark' ? 'outline-light' : 'primary'}
                   onClick={() => handleSaveGame(game._id)}
@@ -143,12 +168,25 @@ const GlobalLibrary = ({ theme, user, searchTerm }) => {
                 >
                   {savingIds.has(game._id) ? 'Salvando...' : 'Salva in libreria'}
                 </Button>
+
                 <Button
                   variant={theme === 'dark' ? 'outline-light' : 'secondary'}
                   onClick={() => navigate(`/games/${game._id}`)}
+                  className="mb-2"
                 >
                   Dettagli
                 </Button>
+
+                {user?.isAdmin && (
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDeleteGame(game._id)}
+                    className="d-flex align-items-center justify-content-center gap-2"
+                  >
+                    <BsTrash />
+                    Elimina gioco
+                  </Button>
+                )}
               </Card.Body>
             </Card>
           </Col>

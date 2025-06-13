@@ -15,7 +15,11 @@ import {
   BsMedium,
   BsGithub,
   BsCamera,
+  BsEye, 
+  BsEyeSlash
 } from "react-icons/bs";
+
+
 
 const socialIcons = {
   facebook: BsFacebook,
@@ -67,6 +71,7 @@ const ProfilePage = ({ theme = "light" }) => {
   const [adminPw, setAdminPw] = useState("");
   const [adminError, setAdminError] = useState("");
   const [showAdminInput, setShowAdminInput] = useState(false);
+  const [showAdminPassword, setShowAdminPassword] = useState(false);
 
   // Prendo la password admin dal file .env (VITE_ADMIN_PASSWORD)
   const adminPasswordFromEnv = import.meta.env.VITE_ADMIN_PASSWORD || "";
@@ -550,33 +555,47 @@ const handleBecomeAdmin = async () => {
                     </Button>
                   ) : (
                     <div
-                      className="d-flex w-100 gap-2 mb-2"
-                      style={{ maxWidth: "400px" }}
-                    >
+                    className="d-flex w-100 gap-2 mb-2"
+                    style={{ maxWidth: "400px" }}
+                  >
+                    <div className="position-relative" style={{ width: "60%" }}>
                       <Form.Control
-                        type="password"
+                        type={showAdminPassword ? "text" : "password"}
                         placeholder="Password admin"
                         value={adminPw}
                         onChange={(e) => setAdminPw(e.target.value)}
                         size="sm"
-                        style={{ width: "60%" }}
                       />
-                      <Button
-                        variant="success"
-                        onClick={handleBecomeAdmin}
-                        size="sm"
+                      <span
+                        onClick={() => setShowAdminPassword(prev => !prev)}
+                        style={{
+                          position: "absolute",
+                          right: 8,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          cursor: "pointer",
+                          opacity: 0.6,
+                        }}
                       >
-                        <BsShieldLock className="me-2" />
-                        Conferma
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        onClick={() => setShowAdminInput(false)}
-                        size="sm"
-                      >
-                        <BsX />
-                      </Button>
+                        {showAdminPassword ? <BsEyeSlash /> : <BsEye />}
+                      </span>
                     </div>
+                    <Button
+                      variant="success"
+                      onClick={handleBecomeAdmin}
+                      size="sm"
+                    >
+                      <BsShieldLock className="me-2" />
+                      Conferma
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={() => setShowAdminInput(false)}
+                      size="sm"
+                    >
+                      <BsX />
+                    </Button>
+                  </div>
                   )}
                   {adminError && (
                     <div className="text-danger mt-2">{adminError}</div>

@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
-import { Form, Button, Container, Row, Col, Card, InputGroup } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import {
+  Form,
+  Button,
+  Container,
+  Row,
+  Col,
+  Card,
+  InputGroup,
+} from 'react-bootstrap';
 import axios from 'axios';
-import { BsGoogle, BsEye, BsEyeSlash } from 'react-icons/bs';
+import {
+  BsGoogle,
+  BsEye,
+  BsEyeSlash
+} from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Login = ({ theme, setUser }) => {
   const [formData, setFormData] = useState({
@@ -17,6 +29,15 @@ const Login = ({ theme, setUser }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
+
+  // 🔁 Se sei già loggato, ti mando subito nella home
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    if (storedUser && token) {
+      navigate('/', { replace: true });
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,16 +53,27 @@ const Login = ({ theme, setUser }) => {
     setMessage('');
 
     try {
-      const payload = { email: formData.email, password: formData.password };
+      const payload = {
+        email: formData.email.trim(),
+        password: formData.password,
+      };
+
       const res = await axios.post(`${BACKEND_URL}/api/users/login`, payload);
 
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
 
-      setUser(res.data.user);  // <-- Ecco la chiamata per aggiornare lo stato globale!
+      setUser(res.data.user);
+
+      if (res.data.user.themePreference) {
+        document.body.className = `${res.data.user.themePreference}-theme`;
+      }
 
       setMessage('Login effettuato con successo!');
-      navigate('/');
+
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
     } catch (error) {
       if (error.response?.data?.message) {
         setMessage(error.response.data.message);
@@ -49,6 +81,7 @@ const Login = ({ theme, setUser }) => {
         setMessage('Errore durante il login');
       }
     }
+
     setLoading(false);
   };
 
@@ -59,19 +92,29 @@ const Login = ({ theme, setUser }) => {
   return (
     <Container
       fluid
-      className={`py-5 ${theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'}`}
+      className={`py-5 ${
+        theme === 'dark' ? 'bg-dark text-light' : 'bg-light text-dark'
+      }`}
       style={{ minHeight: '100vh' }}
     >
       <Row className="justify-content-center align-items-center">
         <Col md={6} lg={5}>
           <Card
-            className={`shadow-lg p-4 ${theme === 'dark' ? 'bg-secondary text-light' : 'bg-white text-dark'}`}
+            className={`shadow-lg p-4 ${
+              theme === 'dark' ? 'bg-secondary text-light' : 'bg-white text-dark'
+            }`}
           >
             <h2 className="text-center mb-3">GameVerse</h2>
             <p className="text-center mb-4">Bentornato su GameVerse</p>
 
             {message && (
-              <div className={`alert ${message.toLowerCase().includes('errore') ? 'alert-danger' : 'alert-success'}`}>
+              <div
+                className={`alert ${
+                  message.toLowerCase().includes('errore')
+                    ? 'alert-danger'
+                    : 'alert-success'
+                }`}
+              >
                 {message}
               </div>
             )}
@@ -105,14 +148,21 @@ const Login = ({ theme, setUser }) => {
                     onClick={toggleShowPassword}
                     type="button"
                     tabIndex={-1}
-                    aria-label={showPassword ? 'Nascondi password' : 'Mostra password'}
+                    aria-label={
+                      showPassword ? 'Nascondi password' : 'Mostra password'
+                    }
                   >
                     {showPassword ? <BsEyeSlash /> : <BsEye />}
                   </Button>
                 </InputGroup>
               </Form.Group>
 
-              <Button type="submit" variant="primary" disabled={loading} className="w-100 mb-3">
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={loading}
+                className="w-100 mb-3"
+              >
                 {loading ? 'Login in corso...' : 'Accedi'}
               </Button>
             </Form>

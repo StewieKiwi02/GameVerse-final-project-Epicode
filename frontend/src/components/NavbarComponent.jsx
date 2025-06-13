@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import {
-  Navbar, Nav, Container, Dropdown, Form, Image
+  Navbar, Nav, Container, Dropdown, Form, Image, Button
 } from "react-bootstrap";
 import {
-  BsSun, BsMoon, BsBook, BsPlusCircle, BsList
+  BsSun, BsMoon, BsBook, BsPlusCircle, BsList, BsBoxArrowInRight, BsPersonPlus
 } from "react-icons/bs";
 import { Link, useNavigate } from 'react-router-dom';
 import "./NavbarComponent.css";
@@ -14,9 +14,30 @@ const NavbarComponent = ({ theme, setTheme, user, setUser, searchTerm, setSearch
   const navigate = useNavigate();
   const debounceTimeout = useRef(null);
 
-  const toggleTheme = () => {
+  const toggleTheme = async () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
+
+    // Aggiorna nel backend solo se l'utente è loggato
+    if (user) {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Token mancante");
+
+        const res = await fetch("/api/users/profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ themePreference: newTheme }),
+        });
+
+        if (!res.ok) throw new Error("Errore aggiornamento tema");
+      } catch (err) {
+        console.error("Errore salvataggio tema nel DB:", err.message);
+      }
+    }
   };
 
   const handleSearchChange = (e) => {
@@ -129,10 +150,10 @@ const NavbarComponent = ({ theme, setTheme, user, setUser, searchTerm, setSearch
           ) : (
             <>
               <Nav.Link as={Link} to="/login" className="btn custom-login-btn me-2 d-flex align-items-center">
-                Login
+                <BsBoxArrowInRight className="me-1" /> Login
               </Nav.Link>
               <Nav.Link as={Link} to="/register" className="btn custom-signin-btn d-flex align-items-center">
-                Sign In
+                <BsPersonPlus className="me-1" /> Sign In
               </Nav.Link>
             </>
           )}
