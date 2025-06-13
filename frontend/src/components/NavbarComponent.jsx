@@ -1,24 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Navbar, Nav, Container, Dropdown, Form, Image
 } from "react-bootstrap";
 import {
-  BsPersonPlus, BsSun, BsMoon, BsBook, BsPlusCircle, BsList
+  BsSun, BsMoon, BsBook, BsPlusCircle, BsList
 } from "react-icons/bs";
 import { Link, useNavigate } from 'react-router-dom';
 import "./NavbarComponent.css";
 
-const NavbarComponent = ({ theme, setTheme, user, setUser }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [results, setResults] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
+const NavbarComponent = ({ theme, setTheme, user, setUser, searchTerm, setSearchTerm }) => {
+  const [results, setResults] = React.useState([]);
+  const [showDropdown, setShowDropdown] = React.useState(false);
   const navigate = useNavigate();
   const debounceTimeout = useRef(null);
 
-  const toggleTheme = async () => {
+  const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
-    // Salvataggio tema backend se serve
   };
 
   const handleSearchChange = (e) => {
@@ -37,7 +35,7 @@ const NavbarComponent = ({ theme, setTheme, user, setUser }) => {
       fetch(`/api/games/search?q=${encodeURIComponent(value.trim())}`)
         .then(res => res.json())
         .then(data => {
-          setResults(data);
+          setResults(Array.isArray(data) ? data : []);
           setShowDropdown(true);
         })
         .catch(() => {
@@ -64,8 +62,6 @@ const NavbarComponent = ({ theme, setTheme, user, setUser }) => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const defaultAvatar = "https://res.cloudinary.com/tuo-cloud-name/image/upload/v1234567890/default-avatar.png";
-
   return (
     <Navbar
       expand="lg"
@@ -86,8 +82,8 @@ const NavbarComponent = ({ theme, setTheme, user, setUser }) => {
           </Dropdown.Menu>
         </Dropdown>
 
-        {/* Barra di ricerca centrata assoluta */}
-        <div className="search-container flex-grow-1 d-flex justify-content-center">
+        {/* Barra di ricerca centrata */}
+        <div className="search-container flex-grow-1 d-flex justify-content-center position-relative">
           <Form.Control
             id="search-input"
             name="search"
@@ -99,10 +95,7 @@ const NavbarComponent = ({ theme, setTheme, user, setUser }) => {
             autoComplete="off"
           />
           {showDropdown && results.length > 0 && (
-            <div
-              className="search-results-dropdown position-absolute"
-              style={{ top: '100%', left: 0, right: 0 }}
-            >
+            <div className="search-results-dropdown">
               {results.map(game => (
                 <div
                   key={game._id}
@@ -132,7 +125,6 @@ const NavbarComponent = ({ theme, setTheme, user, setUser }) => {
                 alt="Profile"
                 style={{ objectFit: "cover", cursor: "pointer" }}
               />
-
             </Nav.Link>
           ) : (
             <>
