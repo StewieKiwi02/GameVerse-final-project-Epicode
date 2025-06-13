@@ -160,6 +160,7 @@ function App() {
         const userData = await res.json();
         if (isMounted) {
           setUser(userData);
+          localStorage.setItem("user", JSON.stringify(userData));
           if (userData.themePreference) {
             setTheme(userData.themePreference);
           }
@@ -167,6 +168,7 @@ function App() {
       } catch (error) {
         console.error('Errore nel recupero utente:', error);
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         if (isMounted) setUser(null);
       }
     }
@@ -182,7 +184,7 @@ function App() {
       });
     } else {
       const token = localStorage.getItem('token');
-      if (token) {
+      if (token && token !== "undefined" && token !== "null") {
         fetchUserFromToken(token);
       } else {
         const storedUser = localStorage.getItem('user');

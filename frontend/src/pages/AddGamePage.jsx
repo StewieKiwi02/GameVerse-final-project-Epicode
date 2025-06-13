@@ -11,7 +11,7 @@ const AddGamePage = ({ theme }) => {
     category: [],
     releaseDate: "",
     platforms: [],
-    genres: [], // usato localmente ma inviato come 'genre' nel backend
+    genres: [],
     languagesInterface: [],
     languagesAudio: [],
     languagesSubtitles: [],
@@ -110,7 +110,7 @@ const AddGamePage = ({ theme }) => {
     }
 
     const result = await res.json();
-    return result.url; // URL immagine Cloudinary
+    return result.url;
   };
 
 const handleSubmit = async (e) => {

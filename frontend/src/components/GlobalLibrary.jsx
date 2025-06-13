@@ -16,31 +16,25 @@ const GlobalLibrary = ({ theme, user, searchTerm }) => {
   const hasMore = games.length < totalGames;
 
   const fetchGamesPage = useCallback(async (pageNum) => {
-  setLoading(true);
-  try {
-    const res = await fetch(`/api/games?page=${pageNum}&limit=${PAGE_SIZE}`);
-    if (!res.ok) throw new Error('Errore caricamento giochi');
-    const data = await res.json();
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/games?page=${pageNum}&limit=${PAGE_SIZE}`);
+      if (!res.ok) throw new Error('Errore caricamento giochi');
+      const data = await res.json();
 
-    console.log('[DEBUG] fetchGamesPage response raw:', data);
+      const gamesData = Array.isArray(data) ? data : [];
+      const total = 9999;
 
-    // Ora data è un array (non { games, total }), aggiorna quindi così:
-    const gamesData = Array.isArray(data) ? data : [];
-    const total = 9999; // Metti un valore alto fittizio per disabilitare il controllo per ora
-
-    console.log('[DEBUG] parsed games:', gamesData);
-    console.log('[DEBUG] parsed total:', total);
-
-    setGames(prev => pageNum === 1 ? gamesData : [...prev, ...gamesData]);
-    setTotalGames(total);
-  } catch (error) {
-    console.error('[DEBUG] fetchGamesPage error:', error);
-    setGames([]);
-    setTotalGames(0);
-  } finally {
-    setLoading(false);
-  }
-}, []);
+      setGames(prev => pageNum === 1 ? gamesData : [...prev, ...gamesData]);
+      setTotalGames(total);
+    } catch (error) {
+      console.error('[DEBUG] fetchGamesPage error:', error);
+      setGames([]);
+      setTotalGames(0);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const fetchGamesSearch = useCallback(async (query) => {
     setLoading(true);
@@ -63,28 +57,24 @@ const GlobalLibrary = ({ theme, user, searchTerm }) => {
     }
   }, []);
 
-  // reset page on search term change
   useEffect(() => {
     if (searchTerm && searchTerm.trim().length > 0) {
       setPage(1);
     }
   }, [searchTerm]);
 
-  // fetch paginated games only if no search term
   useEffect(() => {
     if (!searchTerm || searchTerm.trim().length === 0) {
       fetchGamesPage(page);
     }
   }, [page, searchTerm, fetchGamesPage]);
 
-  // fetch games by search term
   useEffect(() => {
     if (searchTerm && searchTerm.trim().length > 0) {
       fetchGamesSearch(searchTerm.trim());
     }
   }, [searchTerm, fetchGamesSearch]);
 
-  // infinite scroll only if no search term
   useEffect(() => {
     if (searchTerm && searchTerm.trim().length > 0) return;
 
@@ -155,10 +145,20 @@ const GlobalLibrary = ({ theme, user, searchTerm }) => {
               >
                 <Card.Img
                   variant="top"
-                  src={game.coverImage ? import.meta.env.BASE_URL + game.coverImage : 'https://via.placeholder.com/300x180?text=No+Image'}
+                  src={
+                    game.coverImage
+                      ? game.coverImage.startsWith('/assets/')
+                        ? game.coverImage
+                        : `/assets/games/${game.coverImage}`
+                      : 'https://via.placeholder.com/300x180?text=No+Image'
+                  }
                   alt={`${game.title} cover`}
                   style={{ height: '180px', objectFit: 'cover' }}
                   onClick={() => navigate(`/games/${game._id}`)}
+                  onError={(e) => {
+                    console.warn(`[ERROR] Immagine non trovata per ${game.title}: ${game.coverImage}`);
+                    e.currentTarget.src = 'https://via.placeholder.com/300x180?text=No+Image';
+                  }}
                 />
                 <Card.Body className="d-flex flex-column">
                   <Card.Title className="mb-3">{game.title}</Card.Title>
