@@ -1,5 +1,5 @@
 
-# 🎮 Sinossi del progetto – GameVerse
+# 🎮 GameVerse
 
 ---
 
@@ -12,11 +12,11 @@
 GameVerse è un'applicazione web full-stack pensata per chi ama il mondo dei videogiochi.  
 L’obiettivo è offrire una piattaforma coinvolgente e intuitiva dove gli utenti possano:
 
-- Registrarsi e accedere in modo sicuro  
+- Registrarsi e accedere in modo sicuro; sia normalmente che con Google
 - Creare una libreria personale di videogiochi  
-- Visualizzare i dettagli di ciascun titolo  
-- Caricare un avatar come immagine profilo  
-- Commentare i giochi presenti nella libreria principale del sito  
+- Visualizzare i dettagli di ciascun titolo come: generi, categorie, giocabilità, e molto altro
+- Gestire la propria pagina utente, caricare foto e banner personali  
+- Commentare i giochi presenti nella libreria principale del sito e aggiungere propria valutazione personale
 
 L’interfaccia è progettata per essere semplice, accessibile e responsive, così da garantire un’ottima esperienza d’uso da qualsiasi dispositivo, che sia desktop o mobile 📱💻
 
@@ -46,7 +46,6 @@ Si tratta del mio primo progetto full-stack, pronto per essere inserito nel port
 - React-Icons  
 - JWT (autenticazione)  
 - Local Storage  
-- Deploy: Vercel  
 
 ### 🛠️ Backend:
 - Node.js + Express.js  
@@ -55,8 +54,7 @@ Si tratta del mio primo progetto full-stack, pronto per essere inserito nel port
 - JWT (gestione token)  
 - CORS, Dotenv, Multer  
 - Cloudinary (upload immagini)  
-- SendGrid (invio email automatiche)  
-- Deploy: Heroku  
+- SendGrid (invio email automatiche)   
 
 ---
 
@@ -68,5 +66,3 @@ Si tratta del mio primo progetto full-stack, pronto per essere inserito nel port
 - Commenti utenti sui giochi  
 - Email di benvenuto automatica  
 - Layout responsive e ottimizzato 🌐  
-
----
